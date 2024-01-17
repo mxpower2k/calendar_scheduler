@@ -6,7 +6,14 @@ class CustomTextField extends StatelessWidget {
   final String label;
   final bool isTime;
 
-  const CustomTextField({required this.isTime, required this.label, super.key});
+  final FormFieldSetter<String> onSaved;
+
+  const CustomTextField({
+    required this.isTime,
+    required this.onSaved,
+    required this.label,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +37,24 @@ class CustomTextField extends StatelessWidget {
   }
 
   Widget renderTextField() {
-    return TextField(
+    return TextFormField(
+      onSaved: onSaved,
+      // null이 리턴되면 에러가 없다.
+      // 에러가 있으면 에러를 string 값으로 리턴
+      validator: (String? val) {
+        if (val == null || val.isEmpty) {
+          return '값을 입력해주세요';
+        }
+
+        if (isTime) {
+          int time = int.parse(val);
+          if (time < 0) {
+            return '0 이상의 숫자를 입력하세요';
+          } else if (time > 24) {
+            return '24 이하의 숫자를 입력하세요';
+          }
+        }
+      },
       cursorColor: Colors.grey,
       maxLines: isTime ? 1 : null,
       expands: !isTime,
